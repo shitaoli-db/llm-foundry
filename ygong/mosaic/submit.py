@@ -5,9 +5,13 @@ from ygong.mosaic.wsfs import WSFSIntegration
 
 from databricks.sdk import WorkspaceClient
 from mcli import config, Run, RunStatus, create_run
+from mcli.api.engine.engine import MAPIConnection
 from mcli.api.runs.api_get_runs import get_run
 from mcli.cli.m_get.runs import RunDisplayItem
+from mcli.config import MCLIConfig
 from IPython.display import display, clear_output, HTML
+from IPython import get_ipython
+
 import ipywidgets as widgets
 import mlflow
 import pandas as pd
@@ -20,8 +24,6 @@ import logging
 import os
 import sys
 import hashlib
-from mcli.config import MCLIConfig
-from mcli.api.engine.engine import MAPIConnection
 
 logger = logging.getLogger('ygong.mosaic.submit')
 ws_url_map = {
@@ -63,23 +65,23 @@ def _init_connection():
 
         # clean up the old secret. MosaicML doesn't support multiple databricks secrets
         # would have to clean up the old secret if it exists
-        from mcli.api.secrets.api_get_secrets import get_secrets
-        from mcli.api.secrets.api_delete_secrets import delete_secrets
-        from mcli.models.mcli_secret import SecretType
-        s = get_secrets(secret_types=[SecretType.databricks])
-        need_to_create = len(s) == 0
-        if len(s) == 1:
-            if s[0].name != databricks_secret_name:
-                delete_secrets(s)
-                need_to_create = True
-            else:
-                print("databricks secret already exists")
-        if need_to_create:
-            from mcli.objects.secrets.create.databricks import DatabricksSecretCreator
-            from mcli.api.secrets.api_create_secret import create_secret
-            s = DatabricksSecretCreator().create(name=databricks_secret_name, host=workspace_url, token=token)
-            print(f"successfully created databricks secret: {databricks_secret_name}")
-            create_secret(s)
+        # from mcli.api.secrets.api_get_secrets import get_secrets
+        # from mcli.api.secrets.api_delete_secrets import delete_secrets
+        # from mcli.models.mcli_secret import SecretType
+        # s = get_secrets(secret_types=[SecretType.databricks])
+        # need_to_create = len(s) == 0
+        # if len(s) == 1:
+        #     if s[0].name != databricks_secret_name:
+        #         delete_secrets(s)
+        #         need_to_create = True
+        #     else:
+        #         print("databricks secret already exists")
+        # if need_to_create:
+        #     from mcli.objects.secrets.create.databricks import DatabricksSecretCreator
+        #     from mcli.api.secrets.api_create_secret import create_secret
+        #     s = DatabricksSecretCreator().create(name=databricks_secret_name, host=workspace_url, token=token)
+        #     print(f"successfully created databricks secret: {databricks_secret_name}")
+        #     create_secret(s)
      else:
         logger.debug("init_connection in databricks environment")
         wc = WorkspaceClient()
@@ -149,6 +151,12 @@ def _get_run_summary(run: Run, experiment_name: Optional[str] = None):
     return df, experiment_run_link
 
 def _display_run_summary(summary: pd.DataFrame, cancel_button: Optional[widgets.Button]):
+    if not get_ipython() or 'IPKernelApp' not in get_ipython().config:
+        os.system('clear')
+        pd.set_option('display.max_colwidth', None)
+        pd.set_option('display.max_columns', None)
+        print(summary)
+        return
     clear_output(wait=True)
     if cancel_button is not None:
         display(cancel_button)

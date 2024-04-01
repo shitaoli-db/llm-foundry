@@ -149,6 +149,8 @@ setup(
     extras_require=extra_deps,
     python_requires='>=3.9',
     entry_points={
-        'console_scripts': ['llmfoundry = llmfoundry.cli.cli:app'],
+        'console_scripts': [
+            'llmfoundry = llmfoundry.cli.cli:app',
+            'submit = ygong.cli:main'],
     },
 )
