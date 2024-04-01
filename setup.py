@@ -141,6 +141,7 @@ setup(
     url='https://github.com/mosaicml/llm-foundry/',
     package_data={
         'llmfoundry': ['py.typed'],
+        'ygong': ['py.typed'],
     },
     packages=setuptools.find_packages(
         exclude=['.github*', 'mcli*', 'scripts*', 'tests*']),
