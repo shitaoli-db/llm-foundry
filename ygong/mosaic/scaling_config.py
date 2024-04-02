@@ -2,6 +2,7 @@ class ScalingConfig:
     def __init__(
             self,
             gpusNum: int,
+            gpuType: str,
             poolName: str,
             priority: str = 'high',
             preemptible: bool = False, 
@@ -11,12 +12,13 @@ class ScalingConfig:
         self.priority = priority
         self.preemptible = preemptible
         self.retry_on_system_failure = retry_on_system_failure
+        self.gpuType = gpuType
 
     @property
     def toCompute(self):
         return {
             'gpus': self.gpusNum,
-            'gpu_type': 'a100_80gb',
+            'gpu_type': self.gpuType,
             'cluster': self.poolName
         }
     
