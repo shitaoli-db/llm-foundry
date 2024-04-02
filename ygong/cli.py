@@ -41,7 +41,7 @@ def main():
     parser.add_argument('--preemptible', type=bool, help='preemptible', default=False)
     parser.add_argument('--retry_on_system_failure', type=bool, help='retry_on_system_failure', default=False)
     parser.add_argument('--entry_point', type=str, help='entry_point', default="./src/train.py")
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
 
 
     parameters_json = args.parameters_json
